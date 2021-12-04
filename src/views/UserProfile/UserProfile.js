@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import GridItem from "components/Grid/GridItem.js";
 import GridContainer from "components/Grid/GridContainer.js";
@@ -6,6 +6,7 @@ import Card from "components/Card/Card.js";
 import CardHeader from "components/Card/CardHeader.js";
 import CardBody from "components/Card/CardBody.js";
 import MaterialTable from "material-table";
+import Axios from "axios";
 const styles = {
   cardCategoryWhite: {
     "&,& a,& a:hover,& a:focus": {
@@ -37,78 +38,67 @@ const styles = {
 };
 
 const useStyles = makeStyles(styles);
-const emplist = [
-  {
-    sno: "1",
-    date: "22/11/2021",
-    name: "Mehmet",
-    acno: "10724100312345",
-    IFSC: "PKGB0010863",
-    Amount: "100000",
-    userName: "NAGARAJ MAGALA",
-  },
-  {
-    sno: "2",
-    date: "22/11/2021",
-    name: "NAGARAJ",
-    acno: "10724100312345",
-    IFSC: "PKGB0010863",
-    Amount: "100000",
-    userName: "NAGARAJ MAGALA",
-  },
-  {
-    sno: "3",
-    date: "22/11/2021",
-    name: "Mehmet",
-    acno: "10724100312345",
-    IFSC: "PKGB0010863",
-    Amount: "100000",
-    userName: "NAGARAJ MAGALA",
-  },
-  {
-    sno: "4",
-    date: "22/11/2021",
-    name: "MAGALA",
-    acno: "10724100312345",
-    IFSC: "PKGB0010863",
-    Amount: "100000",
-    userName: "NAGARAJ MAGALA",
-  },
-  {
-    sno: "5",
-    date: "22/11/2021",
-    name: "Mehmet",
-    acno: "10724100312345",
-    IFSC: "PKGB0010863",
-    Amount: "100000",
-    userName: "NAGARAJ MAGALA",
-  },
-  {
-    sno: "6",
-    date: "22/11/2021",
-    name: "Mehmet",
-    acno: "10724100312345",
-    IFSC: "PKGB0010863",
-    Amount: "100000",
-    userName: "NAGARAJ MAGALA",
-  },
-];
 export default function TableList() {
+  const AuthStr = window.localStorage.getItem("token");
+  console.log(AuthStr);
+  // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxYTc4MGQ4Y2U4NDA3MDM4OTRhZjUzNSIsImlhdCI6MTYzODQyNjcxOCwiZXhwIjoxNjM4Nzg2NzE4fQ.9kFZXMnQQdpMGUGGR6DsLK0HXM8-U7W0czXqps251yw";
   const classes = useStyles();
-  const [tableData, setTableData] = useState(emplist);
-  const [selectedRows, setSelectedRows] = useState([]);
+  const [tableData, setTableData] = useState([]);
+  // const [tableData, setTableData] = useState(emplist);
+  // const [selectedRows, setSelectedRows] = useState([]);
   const columns = [
-    { title: "Id", field: "sno", filtering: false },
-    { title: "Date", field: "date", type: "date" },
     { title: "Name", field: "name" },
-    { title: "Ac No", field: "acno" },
     { title: "IFSC", field: "IFSC" },
-    { title: "Amount", field: "Amount", type: "numeric" },
-    { title: "Logged in user Name", field: "userName" },
+    { title: "Account No", field: "accountNo" },
+    { title: "Amount", field: "amount" },
+    { title: "Date", field: "date", type: "date" },
   ];
-  const handelBulkDelet = () => {
-    const updatedData = tableData.filter((row) => !selectedRows.includes(row));
-    setTableData(updatedData);
+  useEffect(() => {
+    Axios.get(
+      "https://vendor-backend-api.herokuapp.com/api/records",
+      // "https://vendor-backend-api.herokuapp.com/api/records/userId/61a780d8ce840703894af535",
+      {
+        headers: { "x-auth-token": AuthStr },
+      }
+    )
+      .then((response) => {
+        // If request is good...
+        console.log(response.data.data[0].user);
+        setTableData(response.data.data);
+      })
+      .catch((error) => {
+        console.log("error" + error);
+      });
+  }, []);
+  const User_Delete = (index) => {
+    console.log(index);
+    Axios.delete(
+      "https://vendor-backend-api.herokuapp.com/api/records/" + index,
+      {
+        headers: { "x-auth-token": AuthStr },
+      }
+    ).then((response) => {
+      console.log(response.data);
+    });
+  };
+  const User_Update = (index) => {
+    Axios.put(
+      "https://vendor-backend-api.herokuapp.com/api/records/" + index._id,
+      {
+        name: index.name,
+        username: index.username,
+        accountNo: index.accountNo,
+        IFSC: index.IFSC,
+        amount: index.amount,
+        date: index.date,
+      },
+      {
+        headers: { "x-auth-token": AuthStr },
+      }
+    ).then((response) => {
+      console.log(response.data);
+      // window.location.reload();
+    });
   };
   return (
     <GridContainer>
@@ -122,22 +112,29 @@ export default function TableList() {
               title="User Data"
               columns={columns}
               data={tableData}
-              actions={[
-                {
-                  tooltip: "Remove All Selected Users",
-                  icon: "delete",
-                  // onClick: () => console.log(selectedRows),
-                  onClick: () => handelBulkDelet(),
-                  // onClick: (evt, data) =>
-                  //   alert("You want to delete " + data.length + " rows"),
-                },
-              ]}
-              onSelectionChange={(rows) => setSelectedRows(rows)}
               options={{
-                selection: true,
-                // actionsColumnIndex: -1,
+                // selection: true,
+                actionsColumnIndex: -1,
                 filtering: true,
                 exportButton: true,
+              }}
+              editable={{
+                onRowUpdate: (oldData) =>
+                  new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                      User_Update(oldData);
+                      resolve();
+                      console.log(reject);
+                    }, 1000);
+                  }),
+                onRowDelete: (oldData) =>
+                  new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                      User_Delete(oldData._id);
+                      resolve();
+                      console.log(reject);
+                    }, 1000);
+                  }),
               }}
             />
           </CardBody>
