@@ -23,7 +23,6 @@ const dashboardRoutes = [
   {
     path: "/table",
     name: "User List",
-    rtlName: "قائمة الجدول",
     icon: "content_paste",
     component: TableList,
     layout: "/admin",
@@ -31,7 +30,6 @@ const dashboardRoutes = [
   {
     path: "/user",
     name: "User Data",
-    rtlName: "ملف تعريفي للمستخدم",
     icon: Person,
     component: UserProfile,
     layout: "/admin",
