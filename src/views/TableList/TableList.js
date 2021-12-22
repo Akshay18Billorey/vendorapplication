@@ -46,10 +46,8 @@ const styles = {
 const useStyles = makeStyles(styles);
 export default function TableList() {
   const AuthStr = window.localStorage.getItem("token");
-  console.log(AuthStr);
-  // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxYTRhMWIzNmUxMmY4NjQwMzA4NWU5YyIsImlhdCI6MTYzODE3OTMwMiwiZXhwIjoxNjM4NTM5MzAyfQ.Th2sgTzOZcNwzOiNpU7frBfXWs3Vtj-apA0mM_hMGIw";
+  // console.log(AuthStr);
   const classes = useStyles();
-  // const [userdata, setTableData] = useState([]);
   const [canLoginTruedata, setcanLoginTruedata] = useState([]);
   const [canLoginFalsedata, setcanLoginFalsedata] = useState([]);
   const canLoginFalsedataColumn = [
@@ -59,11 +57,13 @@ export default function TableList() {
     // { title: "Password", field: "password" },
   ];
   const canLoginTruedataColumn = [
+    // { title: "id", field: "_id" },
     { title: "Name", field: "name" },
     { title: "Contact No", field: "phone" },
     { title: "Date", field: "date", type: "date" },
     // { title: "Password", field: "password" },
   ];
+
   useEffect(() => {
     Axios.get("https://vendor-backend-api.herokuapp.com/api/users", {
       headers: { "x-auth-token": AuthStr },
@@ -77,13 +77,19 @@ export default function TableList() {
         let tmpArray = [];
         let canLoginTrue = [];
         let canLoginFalse = [];
-        console.log(response.data.length);
+        // let VendorDetails = [];
+        // console.log(VendorDetails);
+        // console.log(response.data.length);
         for (var i = 0; i < response.data.length; i++) {
           tmpArray.push(response.data[i].canLogin);
           if (response.data[i].canLogin) {
             canLoginTrue.push(response.data[i]);
             // setcanLoginTruedata(canLoginTrue);
             // console.log(canLoginTrue);
+            // let index = response.data[i]._id;
+            // console.log(index);
+            // VendorDetails.push(User_GetData(index));
+            // console.log(VendorDetails);
           } else {
             canLoginFalse.push(response.data[i]);
             // console.log(canLoginFalse);
@@ -200,12 +206,24 @@ export default function TableList() {
           </CardBody>
         </Card>
       </GridItem>
+
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="primary">
             <h4 className={classes.cardTitleWhite}>User List</h4>
           </CardHeader>
           <CardBody>
+            {/* <MaterialTable
+              title="Basic Tree Data Preview"
+              columns={canLoginTruedataColumn}
+              data={canLoginTruedata}
+              parentChildData={(row, rows) =>
+                rows.find((a) => a._id === row._id)
+              }
+              options={{
+                selection: true,
+              }}
+            /> */}
             <MaterialTable
               title="User List"
               columns={canLoginTruedataColumn}
