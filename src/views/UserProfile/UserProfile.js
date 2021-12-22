@@ -42,6 +42,7 @@ export default function TableList() {
   const AuthStr = window.localStorage.getItem("token");
   console.log(AuthStr);
   const classes = useStyles();
+  const [subvendor, setSubVender] = useState();
   const [tableData, setTableData] = useState([]);
   const columns = [
     { title: "Name", field: "name" },
@@ -104,17 +105,19 @@ export default function TableList() {
         console.log("error" + error);
       });
   }, []);
-  // const User_GetData = (index) => {
-  //   // console.log(index);
-  //   Axios.get(
-  //     "https://vendor-backend-api.herokuapp.com/api/records/userId/" + index,
-  //     {
-  //       headers: { "x-auth-token": AuthStr },
-  //     }
-  //   ).then((response) => {
-  //     console.log(response.data);
-  //   });
-  // };
+  const User_GetData = (index) => {
+    // console.log(index);
+    Axios.get(
+      "https://vendor-backend-api.herokuapp.com/api/records/userId/" + index,
+      {
+        headers: { "x-auth-token": AuthStr },
+      }
+    ).then((response) => {
+      console.log(response.data);
+      console.log(response.data.data);
+      setSubVender(response.data.data);
+    });
+  };
   const User_Delete = (index) => {
     console.log(index);
     Axios.delete(
@@ -216,9 +219,9 @@ export default function TableList() {
                 {
                   tooltip: "Show Group",
                   render: (rowData) => {
-                    // console.log(rowData);
+                    console.log(rowData);
                     // const [userdata, setTableData] = useState([]);
-                    // setTableData(User_GetData(rowData._id));
+                    User_GetData(rowData._id);
                     // console.log(userdata);
                     return (
                       <div id="project-features">
@@ -228,6 +231,9 @@ export default function TableList() {
                             <th>Name</th>
                             <th>date</th>
                           </tr>
+                          {subvendor?.map((item) => {
+                            console.log(item, "item");
+                          })}
                           <tr>
                             <td>{rowData._id}</td>
                             <td>{rowData.name}</td>
