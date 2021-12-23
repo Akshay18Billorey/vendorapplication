@@ -43,15 +43,14 @@ export default function TableList() {
   console.log(AuthStr);
   const classes = useStyles();
   const [subvendor, setSubVender] = useState();
-  const [tableData, setTableData] = useState([]);
-  const columns = [
-    { title: "Name", field: "name" },
-    // { title: "id", field: "_id" },
-    { title: "IFSC", field: "IFSC" },
-    { title: "Account No", field: "accountNo" },
-    { title: "Amount", field: "amount" },
-    { title: "Date", field: "date", type: "date" },
-  ];
+  // const [tableData, setTableData] = useState([]);
+  // const columns = [
+  //   { title: "Name", field: "name" },
+  //   { title: "IFSC", field: "IFSC" },
+  //   { title: "Account No", field: "accountNo" },
+  //   { title: "Amount", field: "amount" },
+  //   { title: "Date", field: "date", type: "date" },
+  // ];
   useEffect(() => {
     Axios.get("https://vendor-backend-api.herokuapp.com/api/records", {
       headers: { "x-auth-token": AuthStr },
@@ -59,7 +58,7 @@ export default function TableList() {
       .then((response) => {
         // If request is good...
         console.log(response.data.data);
-        setTableData(response.data.data);
+        // setTableData(response.data.data);
       })
       .catch((error) => {
         console.log("error" + error);
@@ -69,9 +68,9 @@ export default function TableList() {
   const venderlist = [
     // { title: "id", field: "_id" },
     { title: "Main vendor", field: "name" },
-    { title: "Sub Vendor count", field: "vendor count" },
+    { title: "Sub Vendor count", field: "subVendorCount" },
     { title: "Date", field: "date", type: "date" },
-    { title: "Total amount", field: "amount" },
+    { title: "Total amount", field: "totalAmount" },
   ];
   useEffect(() => {
     Axios.get("https://vendor-backend-api.herokuapp.com/api/users", {
@@ -118,71 +117,53 @@ export default function TableList() {
       setSubVender(response.data.data);
     });
   };
-  const User_Delete = (index) => {
-    console.log(index);
-    Axios.delete(
-      "https://vendor-backend-api.herokuapp.com/api/records/" + index,
-      {
-        headers: { "x-auth-token": AuthStr },
-      }
-    ).then((response) => {
-      console.log(response.data);
-    });
-  };
-  const User_Update = (index) => {
-    Axios.put(
-      "https://vendor-backend-api.herokuapp.com/api/records/" + index._id,
-      {
-        name: index.name,
-        username: index.username,
-        accountNo: index.accountNo,
-        IFSC: index.IFSC,
-        amount: index.amount,
-        date: index.date,
-      },
-      {
-        headers: { "x-auth-token": AuthStr },
-      }
-    ).then((response) => {
-      console.log(response.data);
-      // window.location.reload();
-    });
-  };
+  // const User_Delete = (index) => {
+  //   console.log(index);
+  //   Axios.delete(
+  //     "https://vendor-backend-api.herokuapp.com/api/records/" + index,
+  //     {
+  //       headers: { "x-auth-token": AuthStr },
+  //     }
+  //   ).then((response) => {
+  //     console.log(response.data);
+  //   });
+  // };
+  // const User_Update = (index) => {
+  //   Axios.put(
+  //     "https://vendor-backend-api.herokuapp.com/api/records/" + index._id,
+  //     {
+  //       name: index.name,
+  //       username: index.username,
+  //       accountNo: index.accountNo,
+  //       IFSC: index.IFSC,
+  //       amount: index.amount,
+  //       date: index.date,
+  //     },
+  //     {
+  //       headers: { "x-auth-token": AuthStr },
+  //     }
+  //   ).then((response) => {
+  //     console.log(response.data);
+  //     // window.location.reload();
+  //   });
+  // };
   return (
     <GridContainer>
-      <GridItem xs={12} sm={12} md={12}>
+      {/* <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="primary">
             <h4 className={classes.cardTitleWhite}>User Data</h4>
           </CardHeader>
           <CardBody>
-            {/* <MaterialTable
-              columns={columns}
-              data={tableData}
-              title="User Data"
-              options={{
-                // selection: true,
-                actionsColumnIndex: -1,
-                filtering: true,
-                exportButton: true,
-              }}
-              detailPanel={(rowData) => {
-                return User_GetData(rowData._id);
-              }}
-              onRowClick={(event, rowData, togglePanel) => togglePanel()}
-            /> */}
-
-            <MaterialTable
+                      <MaterialTable
               title="User Data"
               columns={columns}
               data={tableData}
               options={{
-                // selection: true,
                 actionsColumnIndex: -1,
                 filtering: true,
                 exportButton: true,
               }}
-              // parentChildData={(row) => console.log(row)}
               editable={{
                 onRowUpdate: (oldData) =>
                   new Promise((resolve, reject) => {
@@ -204,47 +185,77 @@ export default function TableList() {
             />
           </CardBody>
         </Card>
-      </GridItem>
+      </GridItem> */}
       <GridItem xs={12} sm={12} md={12}>
         <Card>
           <CardHeader color="primary">
-            <h4 className={classes.cardTitleWhite}></h4>
+            <h4 className={classes.cardTitleWhite}>User Data</h4>
           </CardHeader>
           <CardBody>
             <MaterialTable
               columns={venderlist}
               data={canLoginTruedata}
               title="User Data"
+              options={{
+                actionsColumnIndex: -1,
+                filtering: true,
+                exportButton: true,
+                defaultExpanded: false,
+              }}
               detailPanel={[
                 {
                   tooltip: "Show Group",
-                  render: (rowData) => {
-                    console.log(rowData);
-                    // const [userdata, setTableData] = useState([]);
-                    User_GetData(rowData._id);
-                    // console.log(userdata);
+                  render: () => {
                     return (
                       <div id="project-features">
-                        <table>
-                          <tr>
-                            <th>id</th>
-                            <th>Name</th>
-                            <th>date</th>
-                          </tr>
-                          {subvendor?.map((item) => {
-                            console.log(item, "item");
-                          })}
-                          <tr>
-                            <td>{rowData._id}</td>
-                            <td>{rowData.name}</td>
-                            <td>{rowData.data}</td>
-                          </tr>
+                        <table
+                          style={{
+                            border: "1px solid black",
+                            width: "100%",
+                          }}
+                        >
+                          <thead>
+                            <tr>
+                              <th>Name</th>
+                              <th>IFSC</th>
+                              <th>accountNo</th>
+                              <th>amount</th>
+                              <th>date</th>
+                              {/* <th>Action</th> */}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {subvendor.map((item, i) => {
+                              return (
+                                <tr
+                                  key={i}
+                                  style={{ border: "1px solid black" }}
+                                >
+                                  <td>{item.name}</td>
+                                  <td>{item.IFSC}</td>
+                                  <td>{item.accountNo}</td>
+                                  <td>{item.amount}</td>
+                                  <td>{item.date} </td>
+                                  {/* <td>
+                                    <button onClick={User_Delete(item._id)} >
+                                      Delete
+                                    </button>
+                                  </td> */}
+                                </tr>
+                              );
+                            })}
+                          </tbody>
                         </table>
                       </div>
                     );
                   },
                 },
               ]}
+              // onRowClick={(event, rowData, togglePanel) => {
+              //   User_GetData(rowData._id);
+              //   togglePanel();
+              // }}
+              onRowClick={(event, rowData) => User_GetData(rowData._id)}
             />
           </CardBody>
         </Card>
